@@ -14,7 +14,7 @@ Algorithm for minimization of total payment for orders with specific payment met
 ### Build
 The project has already built fat-jar but you can also build the project by:
 ```bash
-mvn clean build
+mvn clean package
 ```
 
 ### Run
