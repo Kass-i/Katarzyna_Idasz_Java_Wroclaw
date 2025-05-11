@@ -21,7 +21,6 @@ public class PaymentApplier {
         float discount = (float) paymentMethod.getDiscount() / 100;
         if (limit < orderCost) {
             // The limit is too small
-            System.out.println("\t\t\tLimit too small");
             return false;
         }
 
@@ -39,7 +38,6 @@ public class PaymentApplier {
         float pointsLimit = currentLimits.getPaymentMethods().get("PUNKTY").getLimit();
         if(pointsLimit == 0.0f || pointsLimit < orderCost * 0.10f) {
             // No points or less than 10% order cost - partial payment with discount is impossible
-            System.out.println("\t\tNO POINTS!!!");
             return false;
         }
 
@@ -55,17 +53,15 @@ public class PaymentApplier {
         // Find a card with enough money
         for(PaymentMethodDTO paymentMethod : currentLimits.getPaymentMethods().values()) {
             float limit = paymentMethod.getLimit();
+            // The limit is too small
             if(limit + points < orderCost) {
-                // The limit is too small
-
+                // We can use more points
                 if(!paymentMethod.getId().equals("PUNKTY") && limit + pointsLimit >= orderCost) {
-                    // We can use more points
                     backupList.put(orderCost - limit, paymentMethod);
                 }
                 continue;
             }
 
-            System.out.println("\tWE PAY WITH " + paymentMethod.getId());
             // Update limits
             orderCost *= (1.0f - discount);
             limit -= (orderCost - points);
@@ -81,12 +77,12 @@ public class PaymentApplier {
         if(backupList.isEmpty())
             return false;
 
-        // Take first one - smallest amount of points
+        // Take the first one - smallest amount of points
         Map.Entry<Float, PaymentMethodDTO> firstEntry = backupList.firstEntry();
         points = firstEntry.getKey();
         updatedPoints.setLimit(currentLimits.getPaymentMethods().get("PUNKTY").getLimit() - points);
         PaymentMethodDTO paymentMethod = firstEntry.getValue().clone();
-        System.out.println("\tWE SPENT MORE POINTS - WE PAY WITH " + paymentMethod.getId());
+
         // Update limits
         float limit = paymentMethod.getLimit();
         orderCost *= (1.0f - discount);
@@ -108,8 +104,8 @@ public class PaymentApplier {
         // Find a card with enough money
         for(PaymentMethodDTO paymentMethod : currentLimits.getPaymentMethods().values()) {
             float limit = paymentMethod.getLimit();
+            // The limit is too small
             if(limit < orderCost) {
-                // The limit is too small
                 continue;
             }
 

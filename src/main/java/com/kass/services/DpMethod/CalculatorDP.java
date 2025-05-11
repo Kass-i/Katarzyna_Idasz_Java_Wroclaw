@@ -11,7 +11,7 @@ public class CalculatorDP implements Calculator {
 
     @Override
     public SolutionDTO calculate(List<OrderDTO> orders, List<PaymentMethodDTO> paymentMethods) {
-        DiscountServiceDP dp = new DiscountServiceDP(orders, paymentMethods);
+        DpService dp = new DpService(orders, paymentMethods);
         return dp.calculate();
     }
 }

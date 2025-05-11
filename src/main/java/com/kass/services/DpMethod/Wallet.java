@@ -15,13 +15,10 @@ public class Wallet implements Cloneable {
 
     public Wallet(List<PaymentMethodDTO> paymentMethods) {
         paymentMethods.sort(java.util.Comparator.comparing(PaymentMethodDTO::getDiscount));  // Sort by the most expensive
-        System.out.println("\t\tpaymentMethods" + paymentMethods);
         this.paymentMethods = new LinkedHashMap<>();
         for(PaymentMethodDTO paymentMethodDTO : paymentMethods) {
             this.paymentMethods.put(paymentMethodDTO.getId(), new PaymentMethodDTO(paymentMethodDTO));
         }
-
-        System.out.println("\t\tSORTED CARDS: " + this.paymentMethods);
     }
 
     public Wallet(Wallet other) {

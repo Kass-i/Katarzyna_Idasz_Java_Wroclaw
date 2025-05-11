@@ -17,9 +17,11 @@ public class DiscountManager {
             return;
         }
 
+        // Load json files
         List<OrderDTO> orders = new OrdersLoader().load(args[0]);
         List<PaymentMethodDTO> paymentMethods = new PaymentMethodsLoader().load(args[1]);
 
+        // Calculate solution
         DiscountService discountService = new DiscountService();
         SolutionDTO solution = discountService.calculateCostByDP(orders, paymentMethods);
         System.out.println(solution.toString());

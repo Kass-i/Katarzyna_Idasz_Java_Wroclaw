@@ -11,7 +11,6 @@ import java.util.Map;
 public class SolutionDTO {
     Map<String, Float> solution = new HashMap<>();
 
-
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();

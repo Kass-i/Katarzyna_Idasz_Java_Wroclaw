@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-class DiscountServiceDPTest {
-    static DiscountServiceDP discountServiceDP;
+class DpServiceTest {
+    static DpService dpService;
 
     @BeforeAll
     static void setUp() {
@@ -30,12 +30,12 @@ class DiscountServiceDPTest {
                 new PaymentMethodDTO("mZysk",      10, 180),
                 new PaymentMethodDTO("BosBankrut", 5,  200)
         ));
-        discountServiceDP = new DiscountServiceDP(orders, paymentMethods);
+        dpService = new DpService(orders, paymentMethods);
     }
 
     @Test
     void calculateTest() {
-        SolutionDTO actual = discountServiceDP.calculate();
+        SolutionDTO actual = dpService.calculate();
 
         SolutionDTO expected = new SolutionDTO();
         expected.setSolution(new HashMap<>(Map.of(
@@ -50,12 +50,12 @@ class DiscountServiceDPTest {
     @ParameterizedTest
     @ValueSource(ints = {0b0111, 0b1011, 0b1101, 0b1011, 0b111})
     void isLastOrderTest_shouldReturnTrue(int mask) {
-        assertTrue(discountServiceDP.isLastOrder(mask));
+        assertTrue(dpService.isLastOrder(mask));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0b0011, 0b1001, 0b0000, 0b0010, 0b1, 0b101})
     void isLastOrderTest_shouldReturnFalse(int mask) {
-        assertFalse(discountServiceDP.isLastOrder(mask));
+        assertFalse(dpService.isLastOrder(mask));
     }
 }
