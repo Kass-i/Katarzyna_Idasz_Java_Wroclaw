@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @ToString
-public class OrdersDTO {
+public class OrderDTO {
     @NonNull
     @JsonProperty("id")
     private String id;
