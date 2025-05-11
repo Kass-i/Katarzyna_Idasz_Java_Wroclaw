@@ -1,13 +1,13 @@
 package com.kass.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @NoArgsConstructor
 @Getter
+@Setter
 public class SolutionDTO {
     Map<String, Float> solution = new HashMap<>();
 
