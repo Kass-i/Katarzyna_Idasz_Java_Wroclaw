@@ -14,13 +14,14 @@ public class PaymentApplier {
     @NonNull
     private Wallet currentLimits;
     private float orderCost;
-    private boolean isLastOrder;  // If it is a last order, spent points (only when discount is not reduced)
+    private boolean isLastOrder;  // If it is a last order, spend all points (only when discount is not reduced)
 
+    // Returns true if payment was finalized
     public boolean payWithDiscount(PaymentMethodDTO paymentMethod) {
         float limit = paymentMethod.getLimit();
         float discount = (float) paymentMethod.getDiscount() / 100;
+        // The limit is too small
         if (limit < orderCost) {
-            // The limit is too small
             return false;
         }
 
@@ -34,10 +35,11 @@ public class PaymentApplier {
         return true;
     }
 
+    // Returns true if payment was finalized
     public boolean payWithPointsAndCardDiscount() {
         float pointsLimit = currentLimits.getPaymentMethods().get("PUNKTY").getLimit();
+        // No points or less than 10% order cost - partial payment with discount is impossible
         if(pointsLimit == 0.0f || pointsLimit < orderCost * 0.10f) {
-            // No points or less than 10% order cost - partial payment with discount is impossible
             return false;
         }
 
@@ -49,6 +51,7 @@ public class PaymentApplier {
         updatedPoints.setLimit(currentLimits.getPaymentMethods().get("PUNKTY").getLimit() - points);
         float discount = 0.10f;
 
+        // Backup payment methods - more than 10% points
         TreeMap<Float, PaymentMethodDTO> backupList = new TreeMap<>();
         // Find a card with enough money
         for(PaymentMethodDTO paymentMethod : currentLimits.getPaymentMethods().values()) {
@@ -73,6 +76,7 @@ public class PaymentApplier {
             currentLimits.getPaymentMethods().replace("PUNKTY", updatedPoints);
             return true;
         }
+        // No payment with 10% points:
         // Check backupList
         if(backupList.isEmpty())
             return false;
@@ -96,6 +100,7 @@ public class PaymentApplier {
         return true;
     }
 
+    // Returns true if payment was finalized
     public boolean payWithoutDiscount() {
         // Last order -> spend all points
         if (isLastOrder)

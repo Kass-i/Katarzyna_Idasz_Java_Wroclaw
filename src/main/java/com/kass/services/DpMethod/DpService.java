@@ -84,6 +84,7 @@ public class DpService {
 
                 // Card with no discount
                 if(paymentApplier.payWithoutDiscount()) {
+                    // Paid with regular card
                     updateDP(currentLimits, paymentApplier.getOrderCost(), mask, order);
                 }
                 // No payment
@@ -94,6 +95,7 @@ public class DpService {
         return findSolution();
     }
 
+    // Check if a better solution has been found and update dp
     private void updateDP(Wallet currentLimits, float orderCost, int mask, int order) {
         float oldCost = dp.get(mask).getCost();
         float newCost = orderCost;
@@ -111,6 +113,7 @@ public class DpService {
 
     private SolutionDTO findSolution() {
         SolutionDTO solution = new SolutionDTO();
+        // dp.get(dpSize - 1) - all orders were paid (mask 11...1)
         for(PaymentMethodDTO paymentMethod : dp.get(dpSize - 1).getWallet().getPaymentMethods().values()) {
             float startLimit = wallet.getPaymentMethods().get(paymentMethod.getId()).getLimit();
             float moneyLeft = paymentMethod.getLimit();
@@ -120,6 +123,7 @@ public class DpService {
         return solution;
     }
 
+    // If mask has only one zero -> we have the last order to pay
     protected boolean isLastOrder(int mask) {
         String binary = Integer.toBinaryString(mask);
         int missingBits = orders.size() - binary.length();

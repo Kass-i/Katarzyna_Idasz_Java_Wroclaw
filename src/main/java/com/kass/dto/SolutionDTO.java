@@ -18,7 +18,7 @@ public class SolutionDTO {
             output
                 .append(id)
                 .append(" ")
-                .append(solution.get(id))
+                .append(String.format(java.util.Locale.US, "%.2f", solution.get(id)))
                 .append("\n");
         return output.toString();
     }
