@@ -20,8 +20,8 @@ public class DiscountManager {
         List<OrderDTO> orders = new OrdersLoader().load(args[0]);
         List<PaymentMethodDTO> paymentMethods = new PaymentMethodsLoader().load(args[1]);
 
-        DiscountService discountService = new DiscountService(orders, paymentMethods);
-        SolutionDTO solution = discountService.calculateCostByDP();
+        DiscountService discountService = new DiscountService();
+        SolutionDTO solution = discountService.calculateCostByDP(orders, paymentMethods);
         System.out.println(solution.toString());
     }
 }

@@ -139,7 +139,7 @@ public class DiscountServiceDP {
         return solution;
     }
 
-    private boolean isLastOrder(int mask) {
+    protected boolean isLastOrder(int mask) {
         String binary = Integer.toBinaryString(mask);
         int missingBits = orders.size() - binary.length();
         long zeroCount = binary.chars().filter(ch -> ch == '0').count();
