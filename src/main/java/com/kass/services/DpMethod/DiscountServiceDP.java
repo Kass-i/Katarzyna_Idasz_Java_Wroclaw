@@ -123,22 +123,14 @@ public class DiscountServiceDP {
             return false;
         }
 
+        // Update limits
         orderCost *= (1.0f - discount);
         limit -= orderCost;
         paymentMethod.setLimit(limit);
-        float oldCost = dp.get(mask).getCost();
-        float newCost = orderCost;
-        if(oldCost < Integer.MAX_VALUE) {
-            newCost += oldCost;
-        }
 
-        int newMask = mask | (1 << order);  // Mark this order as paid
-        currentLimits.getPaymentMethods().replace(paymentMethod.getId(), paymentMethod);  // Update limits
-        if (dp.get(newMask).getCost() > newCost) {
-            DpState newState = new DpState(newCost, currentLimits);
-            dp.set(newMask, newState);
-            System.out.println("\t\tNEW dp: " + dp.get(newMask));
-        }
+        // Update wallet
+        currentLimits.getPaymentMethods().replace(paymentMethod.getId(), paymentMethod);
+        updateDP(currentLimits, orderCost, mask, order);
         return true;
     }
 
@@ -170,26 +162,16 @@ public class DiscountServiceDP {
             }
 
             System.out.println("\tWE PAY WITH " + paymentMethod.getId());
+            // Update limits
             orderCost *= (1.0f - discount);
             limit -= (orderCost - points);
             PaymentMethodDTO updatedPaymentMethod = paymentMethod.clone();
             updatedPaymentMethod.setLimit(limit);
 
-            float oldCost = dp.get(mask).getCost();
-            float newCost = orderCost;
-            if(oldCost < Integer.MAX_VALUE) {
-                newCost += oldCost;
-            }
-
-            int newMask = mask | (1 << order);  // Mark this order as paid
-            currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);  // Update limits
+            // Update wallet
+            currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);
             currentLimits.getPaymentMethods().replace("PUNKTY", updatedPoints);
-
-            if (dp.get(newMask).getCost() > newCost) {
-                DpState newState = new DpState(newCost, currentLimits);
-                dp.set(newMask, newState);
-                System.out.println("\t\tNEW dp: " + dp.get(newMask));
-            }
+            updateDP(currentLimits, orderCost, mask, order);
             return true;
         }
         // Check backupList
@@ -202,27 +184,17 @@ public class DiscountServiceDP {
         updatedPoints.setLimit(currentLimits.getPaymentMethods().get("PUNKTY").getLimit() - points);
         PaymentMethodDTO paymentMethod = firstEntry.getValue().clone();
         System.out.println("\tWE SPENT MORE POINTS - WE PAY WITH " + paymentMethod.getId());
+        // Update limits
         float limit = paymentMethod.getLimit();
         orderCost *= (1.0f - discount);
         limit -= (orderCost - points);
         PaymentMethodDTO updatedPaymentMethod = paymentMethod.clone();
         updatedPaymentMethod.setLimit(limit);
 
-        float oldCost = dp.get(mask).getCost();
-        float newCost = orderCost;
-        if(oldCost < Integer.MAX_VALUE) {
-            newCost += oldCost;
-        }
-
-        int newMask = mask | (1 << order);  // Mark this order as paid
-        currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);  // Update limits
+        // Update wallet
+        currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);
         currentLimits.getPaymentMethods().replace("PUNKTY", updatedPoints);
-
-        if (dp.get(newMask).getCost() > newCost) {
-            DpState newState = new DpState(newCost, currentLimits);
-            dp.set(newMask, newState);
-            System.out.println("\t\tNEW dp: " + dp.get(newMask));
-        }
+        updateDP(currentLimits, orderCost, mask, order);
         return true;
     }
 
@@ -235,25 +207,34 @@ public class DiscountServiceDP {
                 continue;
             }
 
+            // Update limits
             limit -= orderCost;
             PaymentMethodDTO updatedPaymentMethod = paymentMethod.clone();
             updatedPaymentMethod.setLimit(limit);
-            float oldCost = dp.get(mask).getCost();
-            float newCost = orderCost;
-            if(oldCost < Integer.MAX_VALUE) {
-                newCost += oldCost;
-            }
 
-            int newMask = mask | (1 << order);  // Mark this order as paid
-            currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);  // Update limits
-            if (dp.get(newMask).getCost() > newCost) {
-                DpState newState = new DpState(newCost, currentLimits);
-                dp.set(newMask, newState);
-            }
+            // Update wallet
+            currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);
+            updateDP(currentLimits, orderCost, mask, order);
             return true;
         }
 
         return false;
+    }
+
+    private void updateDP(Wallet currentLimits, float orderCost, int mask, int order) {
+        float oldCost = dp.get(mask).getCost();
+        float newCost = orderCost;
+        if(oldCost < Integer.MAX_VALUE) {
+            newCost += oldCost;
+        }
+
+        int newMask = mask | (1 << order);  // Mark this order as paid
+
+        if (dp.get(newMask).getCost() > newCost) {
+            DpState newState = new DpState(newCost, currentLimits);
+            dp.set(newMask, newState);
+            System.out.println("\t\tNEW dp: " + dp.get(newMask));
+        }
     }
 
     private boolean isLastOrder(int mask) {
