@@ -3,6 +3,7 @@ package com.kass.services.DpMethod;
 import com.kass.dto.PaymentMethodDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,8 +11,10 @@ import java.util.TreeMap;
 @AllArgsConstructor
 @Getter
 public class PaymentApplier {
+    @NonNull
     private Wallet currentLimits;
     private float orderCost;
+    private boolean isLastOrder;  // If it is a last order, spent points (only when discount is not reduced)
 
     public boolean payWithDiscount(PaymentMethodDTO paymentMethod) {
         float limit = paymentMethod.getLimit();
@@ -41,6 +44,9 @@ public class PaymentApplier {
         }
 
         float points = orderCost * 0.10f;
+        // Last order -> spend all points
+        if (isLastOrder)
+            points = pointsLimit;
         PaymentMethodDTO updatedPoints = currentLimits.getPaymentMethods().get("PUNKTY").clone();
         updatedPoints.setLimit(currentLimits.getPaymentMethods().get("PUNKTY").getLimit() - points);
         float discount = 0.10f;
@@ -95,6 +101,10 @@ public class PaymentApplier {
     }
 
     public boolean payWithoutDiscount() {
+        // Last order -> spend all points
+        if (isLastOrder)
+            orderCost -= currentLimits.getPaymentMethods().get("PUNKTY").getLimit();
+
         // Find a card with enough money
         for(PaymentMethodDTO paymentMethod : currentLimits.getPaymentMethods().values()) {
             float limit = paymentMethod.getLimit();
@@ -110,6 +120,8 @@ public class PaymentApplier {
 
             // Update wallet
             currentLimits.getPaymentMethods().replace(updatedPaymentMethod.getId(), updatedPaymentMethod);
+            if (isLastOrder)
+                currentLimits.getPaymentMethods().get("PUNKTY").setLimit(0.0f);
             return true;
         }
 

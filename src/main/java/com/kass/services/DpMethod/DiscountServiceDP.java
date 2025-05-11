@@ -54,7 +54,7 @@ public class DiscountServiceDP {
                 System.out.println(currentLimits);
                 float orderCost = orders.get(order).getValue();
                 System.out.println("\tOrder = " + order + ", COST = " + orderCost);
-                PaymentApplier paymentApplier = new PaymentApplier(currentLimits, orderCost);
+                PaymentApplier paymentApplier = new PaymentApplier(currentLimits, orderCost, isLastOrder(mask));
 
                 // Points
                 PaymentMethodDTO pointsMethod = currentLimits.getPaymentMethods().get("PUNKTY").clone();
@@ -140,7 +140,10 @@ public class DiscountServiceDP {
     }
 
     private boolean isLastOrder(int mask) {
-        int inverted = ~mask;
-        return (inverted & (inverted - 1)) == 0 && inverted != 0;
+        String binary = Integer.toBinaryString(mask);
+        int missingBits = orders.size() - binary.length();
+        long zeroCount = binary.chars().filter(ch -> ch == '0').count();
+        zeroCount += missingBits;
+        return zeroCount == 1;
     }
 }
