@@ -2,6 +2,7 @@ package com.kass;
 
 import com.kass.dto.OrderDTO;
 import com.kass.dto.PaymentMethodDTO;
+import com.kass.dto.SolutionDTO;
 import com.kass.loaders.OrdersLoader;
 import com.kass.loaders.PaymentMethodsLoader;
 import com.kass.services.DiscountService;
@@ -20,6 +21,7 @@ public class DiscountManager {
         List<PaymentMethodDTO> paymentMethods = new PaymentMethodsLoader().load(args[1]);
 
         DiscountService discountService = new DiscountService(orders, paymentMethods);
-        discountService.calculateCostByDP();
+        SolutionDTO solution = discountService.calculateCostByDP();
+        System.out.println(solution.toString());
     }
 }

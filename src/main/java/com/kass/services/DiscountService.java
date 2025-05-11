@@ -2,6 +2,7 @@ package com.kass.services;
 
 import com.kass.dto.OrderDTO;
 import com.kass.dto.PaymentMethodDTO;
+import com.kass.dto.SolutionDTO;
 import com.kass.services.DpMethod.CalculatorDP;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,8 +17,8 @@ public class DiscountService {
     @NonNull
     private List<PaymentMethodDTO> paymentMethods;
 
-    public void calculateCostByDP() {
+    public SolutionDTO calculateCostByDP() {
         Calculator calculatorDP = new CalculatorDP();
-        calculatorDP.calculate(orders, paymentMethods);
+        return calculatorDP.calculate(orders, paymentMethods);
     }
 }

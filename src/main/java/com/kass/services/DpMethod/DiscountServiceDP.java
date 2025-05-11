@@ -2,6 +2,7 @@ package com.kass.services.DpMethod;
 
 import com.kass.dto.OrderDTO;
 import com.kass.dto.PaymentMethodDTO;
+import com.kass.dto.SolutionDTO;
 import lombok.NonNull;
 
 import java.util.*;
@@ -37,7 +38,7 @@ public class DiscountServiceDP {
         System.out.println("\t\tDP: " + dp);
     }
 
-    public void calculate() {
+    public SolutionDTO calculate() {
         for (int mask = 0; mask < dpSize; mask++) {
             System.out.println("WE ARE IN MASK = " + mask);
             for (int order = 0; order < orders.size(); order++) {
@@ -105,17 +106,7 @@ public class DiscountServiceDP {
         }
 
         // Find solution
-        Map<String, Float> solution = new LinkedHashMap<>();
-        System.out.println("\t\tSPENT: " + dp.get(dpSize - 1).getCost());
-        for(PaymentMethodDTO paymentMethod : dp.get(dpSize - 1).getWallet().getPaymentMethods().values()) {
-            float startLimit = wallet.getPaymentMethods().get(paymentMethod.getId()).getLimit();
-            System.out.println(startLimit);
-            float moneyLeft = paymentMethod.getLimit();
-            System.out.println(moneyLeft);
-            solution.put(paymentMethod.getId(), startLimit - moneyLeft);
-        }
-
-        System.out.println(solution);
+        return findSolution();
     }
 
     private void updateDP(Wallet currentLimits, float orderCost, int mask, int order) {
@@ -132,6 +123,20 @@ public class DiscountServiceDP {
             dp.set(newMask, newState);
             System.out.println("\t\tNEW dp: " + dp.get(newMask));
         }
+    }
+
+    private SolutionDTO findSolution() {
+        SolutionDTO solution = new SolutionDTO();
+        System.out.println("\t\tSPENT: " + dp.get(dpSize - 1).getCost());
+        for(PaymentMethodDTO paymentMethod : dp.get(dpSize - 1).getWallet().getPaymentMethods().values()) {
+            float startLimit = wallet.getPaymentMethods().get(paymentMethod.getId()).getLimit();
+            System.out.println(startLimit);
+            float moneyLeft = paymentMethod.getLimit();
+            System.out.println(moneyLeft);
+            solution.getSolution().put(paymentMethod.getId(), startLimit - moneyLeft);
+        }
+
+        return solution;
     }
 
     private boolean isLastOrder(int mask) {
